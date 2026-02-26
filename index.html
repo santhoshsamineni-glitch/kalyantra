@@ -1423,7 +1423,76 @@
         }
         
         .hidden { display: none !important; }
-    </style>
+    
+        /* ── TCS CHIP BUTTONS ── */
+        .tcs-chip {
+            padding: 5px 12px;
+            border: 1.5px solid var(--border-medium);
+            background: #fff;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .tcs-chip.active {
+            background: var(--navy);
+            color: var(--accent-gold);
+            border-color: var(--navy);
+        }
+        .tcs-chip:hover:not(.active) {
+            border-color: var(--navy);
+            color: var(--navy);
+        }
+
+        /* ── TCS ELEMENT ROW ── */
+        .tcs-element-group { margin-bottom: 14px; }
+        .tcs-group-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--navy);
+            padding: 4px 10px;
+            background: #f0f4ff;
+            border-left: 3px solid var(--navy);
+            margin-bottom: 6px;
+        }
+        .tcs-element-row {
+            display: grid;
+            grid-template-columns: 24px 200px 120px 80px 1fr;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            border-radius: 5px;
+            border: 1px solid transparent;
+            transition: background 0.1s;
+            font-size: 0.8rem;
+        }
+        .tcs-element-row:hover { background: #f8fafc; }
+        .tcs-element-row.checked { background: #f0fdf4; border-color: #bbf7d0; }
+        .tcs-element-row input[type=checkbox] { cursor: pointer; width: 15px; height: 15px; }
+        .tcs-elem-name { font-weight: 600; color: var(--navy); }
+        .tcs-elem-name.disabled { color: var(--text-secondary); font-weight: 400; }
+        .tcs-elem-size input {
+            width: 100%;
+            padding: 3px 7px;
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            font-size: 0.78rem;
+            background: #fff;
+        }
+        .tcs-elem-unit { font-size: 0.72rem; color: var(--text-secondary); }
+        .tcs-elem-boq { font-size: 0.7rem; color: #16a34a; }
+
+        /* ── STRUCTURE BOQ PANEL ── */
+        .struct-boq-panel {
+            margin-top: 12px;
+            border-top: 2px dashed #7c3aed;
+            padding-top: 12px;
+        }
+</style>
 </head>
 <body>
     <div class="app-container">
@@ -1691,253 +1760,109 @@
             
             <!-- TAB 2: TCS (TABULAR 70/30) -->
             <div class="tab-panel" id="tab2">
-                <div class="content-container" style="padding-bottom:80px;">
+    <div class="content-container" style="padding-bottom:80px;">
 
-                    <!-- ══ PART A: MASTER TCS PROFILE ══ -->
-                    <div class="section" id="tcsPartA">
-                        <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;">
-                            <span>A. Master TCS Profile</span>
-                            <span style="font-size:0.72rem;font-weight:400;color:var(--text-secondary);">Default cross-section — can be overridden per section</span>
-                        </div>
-
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-                            <div>
-                                <label class="form-label">Carriage Width (m)</label>
-                                <input type="number" class="form-input" id="tcsCarriageWidth" value="7.0" step="0.5"
-                                    onchange="updateMasterTCS()" oninput="updateMasterTCS()">
-                            </div>
-                            <div>
-                                <label class="form-label">Shoulder Width (m)</label>
-                                <input type="number" class="form-input" id="tcsShoulderWidth" value="1.5" step="0.25"
-                                    onchange="updateMasterTCS()" oninput="updateMasterTCS()">
-                            </div>
-                        </div>
-
-                        <div style="font-size:0.8rem;font-weight:700;color:var(--navy);margin-bottom:10px;">Pavement Layers</div>
-                        <div style="overflow-x:auto;">
-                        <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
-                            <thead>
-                                <tr style="background:var(--navy);color:#fff;">
-                                    <th style="padding:8px 10px;text-align:left;">Layer</th>
-                                    <th style="padding:8px 10px;text-align:left;">Material</th>
-                                    <th style="padding:8px 10px;text-align:center;">Thickness (mm)</th>
-                                    <th style="padding:8px 10px;text-align:center;">Include</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr style="border-bottom:1px solid var(--border-light);">
-                                    <td style="padding:7px 10px;font-weight:700;color:#92400e;">GSB</td>
-                                    <td style="padding:7px 10px;color:var(--text-secondary);">Granular Sub Base</td>
-                                    <td style="padding:7px 10px;text-align:center;">
-                                        <input type="number" id="tcsGSB" value="250" min="0" max="600" step="25"
-                                            style="width:80px;padding:4px 8px;border:1px solid var(--border-light);border-radius:4px;text-align:center;font-size:0.82rem;"
-                                            onchange="updateMasterTCS()">
-                                    </td>
-                                    <td style="padding:7px 10px;text-align:center;"><input type="checkbox" id="tcsGSBon" checked onchange="updateMasterTCS()"></td>
-                                </tr>
-                                <tr style="border-bottom:1px solid var(--border-light);">
-                                    <td style="padding:7px 10px;font-weight:700;color:#1d4ed8;">WMM</td>
-                                    <td style="padding:7px 10px;color:var(--text-secondary);">Wet Mix Macadam</td>
-                                    <td style="padding:7px 10px;text-align:center;">
-                                        <input type="number" id="tcsWMM" value="250" min="0" max="400" step="25"
-                                            style="width:80px;padding:4px 8px;border:1px solid var(--border-light);border-radius:4px;text-align:center;font-size:0.82rem;"
-                                            onchange="updateMasterTCS()">
-                                    </td>
-                                    <td style="padding:7px 10px;text-align:center;"><input type="checkbox" id="tcsWMMon" checked onchange="updateMasterTCS()"></td>
-                                </tr>
-                                <tr style="border-bottom:1px solid var(--border-light);">
-                                    <td style="padding:7px 10px;font-weight:700;color:#1e40af;">DBM</td>
-                                    <td style="padding:7px 10px;color:var(--text-secondary);">Dense Bituminous Macadam</td>
-                                    <td style="padding:7px 10px;text-align:center;">
-                                        <input type="number" id="tcsDBM" value="50" min="0" max="200" step="10"
-                                            style="width:80px;padding:4px 8px;border:1px solid var(--border-light);border-radius:4px;text-align:center;font-size:0.82rem;"
-                                            onchange="updateMasterTCS()">
-                                    </td>
-                                    <td style="padding:7px 10px;text-align:center;"><input type="checkbox" id="tcsDBMon" checked onchange="updateMasterTCS()"></td>
-                                </tr>
-                                <tr>
-                                    <td style="padding:7px 10px;font-weight:700;color:#0f172a;">BC</td>
-                                    <td style="padding:7px 10px;color:var(--text-secondary);">Bituminous Concrete</td>
-                                    <td style="padding:7px 10px;text-align:center;">
-                                        <input type="number" id="tcsBC" value="40" min="0" max="100" step="10"
-                                            style="width:80px;padding:4px 8px;border:1px solid var(--border-light);border-radius:4px;text-align:center;font-size:0.82rem;"
-                                            onchange="updateMasterTCS()">
-                                    </td>
-                                    <td style="padding:7px 10px;text-align:center;"><input type="checkbox" id="tcsOnBC" checked onchange="updateMasterTCS()"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        </div>
+        <!-- ═══════════════════════════════════════════════════════════
+             PART A — ROAD CLASSIFICATION
+        ═══════════════════════════════════════════════════════════ -->
+        <div class="section" id="tcsPartA">
+            <div class="section-header">A. Road Classification</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:14px;">
+                <div>
+                    <label class="form-label" style="font-size:0.76rem;font-weight:700;color:var(--navy);display:block;margin-bottom:6px;">Road Category</label>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;" id="tcsRoadCategory">
+                        <button class="tcs-chip active" onclick="tcsChip(this,'tcsRoadCategory','NH/SH')">NH / SH</button>
+                        <button class="tcs-chip" onclick="tcsChip(this,'tcsRoadCategory','Expressway')">Expressway</button>
+                        <button class="tcs-chip" onclick="tcsChip(this,'tcsRoadCategory','Urban')">Urban</button>
+                        <button class="tcs-chip" onclick="tcsChip(this,'tcsRoadCategory','MDR')">MDR / ODR</button>
                     </div>
-
-                    <!-- ══ PART B: CHAINAGE SECTIONS ══ -->
-                    <div class="section" style="margin-top:16px;">
-                        <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;">
-                            <span>B. Chainage Sections & BOQ</span>
-                            <div style="display:flex;gap:8px;">
-                                <button onclick="tcsAddSection()"
-                                    style="background:var(--accent-gold);color:#1B3B6F;border:none;padding:6px 14px;border-radius:5px;font-weight:700;font-size:0.78rem;cursor:pointer;">
-                                    + Add Section
-                                </button>
-                                <button onclick="boqGenerateWBS()"
-                                    style="background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;padding:6px 14px;border-radius:5px;font-weight:700;font-size:0.78rem;cursor:pointer;">
-                                    ⚡ Generate WBS & Schedule
-                                </button>
-                            </div>
-                        </div>
-                        <div style="font-size:0.76rem;color:var(--text-secondary);margin-bottom:12px;">
-                            Each section has its own TCS override + BOQ items + Linear items.
-                            After entering all sections, click Generate to auto-build WBS & Schedule.
-                        </div>
-
-                        <!-- BOQ SUMMARY BAR -->
-                        <div id="boqSummaryBar" style="display:none;margin-bottom:12px;display:flex;gap:16px;flex-wrap:wrap;background:var(--bg-surface);border:1px solid var(--border-light);border-radius:8px;padding:10px 16px;">
-                            <div style="text-align:center;">
-                                <div style="font-size:1rem;font-weight:700;color:var(--navy);" id="boqTotalValue">₹0.00 Cr</div>
-                                <div style="font-size:0.68rem;color:var(--text-secondary);">Total BOQ</div>
-                            </div>
-                            <div style="width:1px;background:var(--border-light);"></div>
-                            <div style="text-align:center;">
-                                <div style="font-size:1rem;font-weight:700;color:#16a34a;" id="boqEarnedValue">₹0.00 Cr</div>
-                                <div style="font-size:0.68rem;color:var(--text-secondary);">Earned</div>
-                            </div>
-                            <div style="width:1px;background:var(--border-light);"></div>
-                            <div style="text-align:center;">
-                                <div style="font-size:1rem;font-weight:700;color:var(--accent-gold);" id="boqFinancialPct">0.0%</div>
-                                <div style="font-size:0.68rem;color:var(--text-secondary);">Financial %</div>
-                            </div>
-                            <div style="width:1px;background:var(--border-light);"></div>
-                            <div style="text-align:center;">
-                                <div style="font-size:1rem;font-weight:700;color:#dc2626;" id="boqBlockedValue">₹0.00 L</div>
-                                <div style="font-size:0.68rem;color:var(--text-secondary);">Blocked</div>
-                            </div>
-                            <div style="width:1px;background:var(--border-light);"></div>
-                            <div style="text-align:center;">
-                                <div style="font-size:1rem;font-weight:700;color:#7c3aed;" id="boqDeviationCount">0</div>
-                                <div style="font-size:0.68rem;color:var(--text-secondary);">Deviations</div>
-                            </div>
-                        </div>
-
-                        <!-- SECTIONS LIST (BOQ integrated) -->
-                        <div id="boqSectionsList"></div>
-
-                        <!-- EMPTY STATE -->
-                        <div id="boqEmptyState" style="text-align:center;padding:40px 20px;color:var(--text-secondary);">
-                            <div style="font-size:2.5rem;margin-bottom:10px;">📐</div>
-                            <div style="font-size:0.9rem;font-weight:600;color:var(--navy);margin-bottom:6px;">No sections defined yet</div>
-                            <div style="font-size:0.78rem;margin-bottom:16px;">
-                                Add chainage sections with their own TCS and BOQ items.<br>
-                                Each section drives activities, quantities and financial progress.
-                            </div>
-                            <button onclick="tcsAddSection()"
-                                style="background:var(--accent-gold);color:#1B3B6F;font-weight:700;border:none;padding:8px 20px;border-radius:5px;cursor:pointer;font-size:0.85rem;">
-                                + Add First Section
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- ══ PART C: STRUCTURE BOQ ══ -->
-                    <div class="section" style="margin-top:16px;">
-                        <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;">
-                            <span>C. Structure BOQ</span>
-                            <button onclick="boqAddStructureBOQ()"
-                                style="background:#7c3aed;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-weight:700;font-size:0.78rem;cursor:pointer;">
-                                🌉 Add Structure BOQ
-                            </button>
-                        </div>
-                        <div style="font-size:0.76rem;color:var(--text-secondary);margin-bottom:10px;">
-                            Enter BOQ items per structure manually. Quantities from structural drawings.
-                        </div>
-                        <div id="boqStructuresList">
-                            <div id="boqStructEmptyState" style="color:var(--text-secondary);font-size:0.8rem;padding:8px 0;">
-                                No structure BOQ added yet. Add structures in the Structures tab first.
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
-
-                <!-- Sticky Nav Footer -->
-                <div style="position:sticky;bottom:0;background:#1B3B6F;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-top:3px solid #D4AF37;z-index:20;">
-                    <button onclick="switchMainTab(0)" style="padding:8px 20px;background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-weight:600;font-size:0.85rem;cursor:pointer;">← Previous</button>
-                    <span style="font-size:0.8rem;color:rgba(255,255,255,0.6);font-weight:500;">Step 2 of 6 · TCS & Sections</span>
-                    <button onclick="switchMainTab(2)" style="padding:8px 20px;background:#D4AF37;color:#1B3B6F;border:none;border-radius:6px;font-weight:700;font-size:0.85rem;cursor:pointer;">Next: Structures →</button>
+                <div>
+                    <label class="form-label" style="font-size:0.76rem;font-weight:700;color:var(--navy);display:block;margin-bottom:6px;">Carriageway Type</label>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;" id="tcsLaneType">
+                        <button class="tcs-chip" onclick="tcsChip(this,'tcsLaneType','2-Lane')">2-Lane</button>
+                        <button class="tcs-chip active" onclick="tcsChip(this,'tcsLaneType','4-Lane')">4-Lane Divided</button>
+                        <button class="tcs-chip" onclick="tcsChip(this,'tcsLaneType','6-Lane')">6-Lane</button>
+                        <button class="tcs-chip" onclick="tcsChip(this,'tcsLaneType','8-Lane')">8-Lane</button>
+                    </div>
                 </div>
-            </div>
-            
-                        
-            <!-- TAB 2: TCS (TABULAR 70/30) -->
-            <div class="tab-panel" id="tab2">
-                <div class="tabular-container">
-                    <div class="toolbar">
-                        <div class="toolbar-left">
-                            <button class="btn btn-success btn-sm" onclick="addTCS()">+ Add TCS</button>
-                            <button class="btn btn-secondary btn-sm">Delete</button>
-                        </div>
-                        <button class="btn btn-primary btn-sm">Save All</button>
-                    </div>
-                    
-                    <div class="content-split">
-                        <div class="table-panel">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 40px;"><input type="checkbox"></th>
-                                        <th>From Ch</th>
-                                        <th>To Ch</th>
-                                        <th>Type</th>
-                                        <th>Lanes</th>
-                                        <th>Median</th>
-                                        <th>Proposal</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tcsTable">
-                                    <tr onclick="selectTCS(this, 0)">
-                                        <td><input type="checkbox" onclick="event.stopPropagation()"></td>
-                                        <td><strong>0+000</strong></td>
-                                        <td><strong>5+000</strong></td>
-                                        <td>Main Carriageway</td>
-                                        <td>4-Lane</td>
-                                        <td>Raised</td>
-                                        <td>New</td>
-                                    </tr>
-                                    <tr onclick="selectTCS(this, 1)">
-                                        <td><input type="checkbox" onclick="event.stopPropagation()"></td>
-                                        <td><strong>5+000</strong></td>
-                                        <td><strong>10+000</strong></td>
-                                        <td>Main Carriageway</td>
-                                        <td>4-Lane</td>
-                                        <td>Raised</td>
-                                        <td>New</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <div class="detail-panel">
-                            <div class="detail-header">TCS Details</div>
-                            <div class="detail-tabs">
-                                <button class="detail-tab active" onclick="switchTCSTab(0)">Components</button>
-                                <button class="detail-tab" onclick="switchTCSTab(1)">Drawing Status</button>
-                            </div>
-                            <div class="detail-content" id="tcsDetailContent">
-                                <div class="empty-state">
-                                    <div class="empty-icon">🛣️</div>
-                                    <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 10px;">No TCS Section Selected</div>
-                                    <div style="font-size: 0.9rem;">Click any row to view details</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Sticky Nav Footer -->
-                    <div style="position:sticky;bottom:0;background:#1B3B6F;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-top:3px solid #D4AF37;z-index:20;margin-top:auto;">
-                        <button onclick="switchMainTab(0)" style="padding:8px 20px;background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-weight:600;font-size:0.85rem;cursor:pointer;">← Previous</button>
-                        <span style="font-size:0.8rem;color:rgba(255,255,255,0.6);font-weight:500;">Step 2 of 6 · TCS Profile</span>
-                        <button onclick="switchMainTab(2)" style="padding:8px 20px;background:#D4AF37;color:#1B3B6F;border:none;border-radius:6px;font-weight:700;font-size:0.85rem;cursor:pointer;">Next: Structures →</button>
+                <div>
+                    <label class="form-label" style="font-size:0.76rem;font-weight:700;color:var(--navy);display:block;margin-bottom:6px;">Construction Type</label>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;" id="tcsConstType">
+                        <button class="tcs-chip active" onclick="tcsChip(this,'tcsConstType','New')">New Construction</button>
+                        <button class="tcs-chip" onclick="tcsChip(this,'tcsConstType','Widening')">Widening</button>
+                        <button class="tcs-chip" onclick="tcsChip(this,'tcsConstType','Overlay')">Overlay</button>
                     </div>
                 </div>
             </div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <button onclick="tcsLoadTemplate()" style="background:var(--accent-gold);color:#1B3B6F;border:none;padding:7px 16px;border-radius:5px;font-weight:700;font-size:0.8rem;cursor:pointer;">
+                    ⚡ Load Standard Template
+                </button>
+                <span style="font-size:0.75rem;color:var(--text-secondary);">Fills standard elements below based on IRC specifications</span>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PART B — CROSS-SECTION ELEMENTS
+        ═══════════════════════════════════════════════════════════ -->
+        <div class="section" style="margin-top:14px;" id="tcsPartB">
+            <div class="section-header">B. Cross-Section Elements</div>
+            <div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:12px;">
+                Check elements present in this project. Width/Size fields are for reference only — no quantity calculation. 
+                <b>Checked elements generate BOQ item suggestions in each section.</b>
+            </div>
+
+            <!-- Element group renderer target -->
+            <div id="tcsElementsGrid"></div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PART C — CHAINAGE SECTIONS & BOQ
+        ═══════════════════════════════════════════════════════════ -->
+        <div class="section" style="margin-top:14px;" id="tcsPartC">
+            <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;">
+                <span>C. Chainage Sections & BOQ</span>
+                <div style="display:flex;gap:8px;">
+                    <button onclick="tcsAddSection()" style="background:var(--accent-gold);color:#1B3B6F;border:none;padding:6px 14px;border-radius:5px;font-weight:700;font-size:0.78rem;cursor:pointer;">+ Add Section</button>
+                    <button onclick="boqGenerateWBS()" style="background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border:none;padding:6px 14px;border-radius:5px;font-weight:700;font-size:0.78rem;cursor:pointer;">⚡ Generate WBS & Schedule</button>
+                </div>
+            </div>
+            <div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:12px;">
+                Each section can have unique chainage range + BOQ items auto-suggested from checked elements above.
+            </div>
+
+            <!-- Summary Bar -->
+            <div id="boqSummaryBar" style="display:none;margin-bottom:12px;display:flex;gap:16px;flex-wrap:wrap;background:var(--bg-surface);border:1px solid var(--border-light);border-radius:8px;padding:10px 16px;">
+                <div style="text-align:center;"><div style="font-size:1rem;font-weight:700;color:var(--navy);" id="boqTotalValue">₹0 Cr</div><div style="font-size:0.68rem;color:var(--text-secondary);">Total BOQ</div></div>
+                <div style="width:1px;background:var(--border-light);"></div>
+                <div style="text-align:center;"><div style="font-size:1rem;font-weight:700;color:#16a34a;" id="boqEarnedValue">₹0 Cr</div><div style="font-size:0.68rem;color:var(--text-secondary);">Earned</div></div>
+                <div style="width:1px;background:var(--border-light);"></div>
+                <div style="text-align:center;"><div style="font-size:1rem;font-weight:700;color:var(--accent-gold);" id="boqFinancialPct">0%</div><div style="font-size:0.68rem;color:var(--text-secondary);">Financial %</div></div>
+                <div style="width:1px;background:var(--border-light);"></div>
+                <div style="text-align:center;"><div style="font-size:1rem;font-weight:700;color:#dc2626;" id="boqBlockedValue">₹0 L</div><div style="font-size:0.68rem;color:var(--text-secondary);">Blocked</div></div>
+                <div style="width:1px;background:var(--border-light);"></div>
+                <div style="text-align:center;"><div style="font-size:1rem;font-weight:700;color:#7c3aed;" id="boqDeviationCount">0</div><div style="font-size:0.68rem;color:var(--text-secondary);">Deviations</div></div>
+            </div>
+
+            <div id="boqSectionsList"></div>
+            <div id="boqEmptyState" style="text-align:center;padding:40px 20px;color:var(--text-secondary);">
+                <div style="font-size:2.5rem;margin-bottom:8px;">📐</div>
+                <div style="font-size:0.9rem;font-weight:600;color:var(--navy);margin-bottom:6px;">No chainage sections yet</div>
+                <div style="font-size:0.78rem;margin-bottom:16px;">Check elements in Part B, then add sections below.<br>BOQ items will be auto-suggested from checked elements.</div>
+                <button onclick="tcsAddSection()" style="background:var(--accent-gold);color:#1B3B6F;font-weight:700;border:none;padding:8px 20px;border-radius:5px;cursor:pointer;font-size:0.85rem;">+ Add First Section</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Sticky Nav Footer -->
+    <div style="position:sticky;bottom:0;background:#1B3B6F;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-top:3px solid #D4AF37;z-index:20;">
+        <button onclick="switchMainTab(0)" style="padding:8px 20px;background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-weight:600;font-size:0.85rem;cursor:pointer;">← Previous</button>
+        <span style="font-size:0.8rem;color:rgba(255,255,255,0.6);">Step 2 of 6 · TCS & Sections</span>
+        <button onclick="switchMainTab(2)" style="padding:8px 20px;background:#D4AF37;color:#1B3B6F;border:none;border-radius:6px;font-weight:700;font-size:0.85rem;cursor:pointer;">Next: Structures →</button>
+    </div>
+</div>
             
             <!-- TAB 3: STRUCTURES (TABULAR WITH 4 DETAIL TABS) -->
             <div class="tab-panel" id="tab3">
@@ -4934,6 +4859,7 @@
             document.querySelectorAll('#structuresTable tr').forEach(r => r.classList.remove('selected'));
             row.classList.add('selected');
             
+            const _structIdx = index;
             document.getElementById('structureDetailContent').innerHTML = `
                 <!-- TAB 1: BASIC -->
                 <div class="detail-tab-content active">
@@ -5455,6 +5381,19 @@
             // Store index on container for event-delegation saves
             const sc = document.getElementById('structureDetailContent');
             if (sc) sc.setAttribute('data-struct-idx', index);
+            // Inject Structure BOQ panel inline below detail content
+            setTimeout(() => {
+                const detail = document.getElementById('structureDetailContent');
+                if (detail && typeof renderStructureBOQInline === 'function') {
+                    let wrap = document.getElementById('structBOQPanel_' + index);
+                    if (!wrap) {
+                        wrap = document.createElement('div');
+                        wrap.id = 'structBOQPanel_' + index;
+                        detail.appendChild(wrap);
+                    }
+                    renderStructureBOQInline(index);
+                }
+            }, 80);
         }
         
         // Tab 4 - Hindrances Functions
@@ -9717,292 +9656,524 @@
 
     </script>
 
+
 <script>
+// ═══════════════════════════════════════════════════════════════════════
+// TCS ENGINE — IRC-BASED CROSS SECTION + BOQ INTEGRATION
+// ═══════════════════════════════════════════════════════════════════════
 
-        // ═══════════════════════════════════════════════════════════════
-        // TCS & SECTIONS — MASTER TCS + PER-SECTION TCS + BOQ
-        // ═══════════════════════════════════════════════════════════════
+// ── IRC ELEMENT DEFINITIONS ─────────────────────────────────────────────
+const TCS_ELEMENTS = [
+    { group: 'CARRIAGEWAY & LANES', items: [
+        { id:'MAIN_CW',  name:'Main Carriageway',       sizeLabel:'Width (m)', defaultSize:'7.0',  unit:'m', boqSuggest:'Carriageway formation including all pavement layers', boqUnit:'RMT', morthRef:'MoRTH Sec 300-500' },
+        { id:'SERVICE',  name:'Service Road',            sizeLabel:'Width (m)', defaultSize:'3.5',  unit:'m', boqSuggest:'Service road construction', boqUnit:'RMT', morthRef:'IRC:86' },
+        { id:'CYCLE',    name:'Cycle Track',             sizeLabel:'Width (m)', defaultSize:'2.0',  unit:'m', boqSuggest:'Cycle track formation', boqUnit:'RMT', morthRef:'IRC:11' },
+    ]},
+    { group: 'MEDIAN', items: [
+        { id:'MED_RAISED',name:'Raised Median',          sizeLabel:'Width (m)', defaultSize:'4.5',  unit:'m', boqSuggest:'Raised median construction with kerb', boqUnit:'RMT', morthRef:'IRC:SP:73' },
+        { id:'MED_DEPRES',name:'Depressed Median',       sizeLabel:'Width (m)', defaultSize:'5.0',  unit:'m', boqSuggest:'Depressed median earthwork & finish', boqUnit:'RMT', morthRef:'IRC:SP:73' },
+        { id:'MED_PLANT', name:'Plantation Strip (Median)',sizeLabel:'Width (m)',defaultSize:'2.0',  unit:'m', boqSuggest:'Median plantation & horticulture', boqUnit:'RMT', morthRef:'MoRTH Sec 309' },
+    ]},
+    { group: 'SHOULDERS', items: [
+        { id:'SHL_PAVED', name:'Paved Shoulder',         sizeLabel:'Width (m)', defaultSize:'1.5',  unit:'m', boqSuggest:'Paved shoulder including granular layers', boqUnit:'RMT', morthRef:'IRC:SP:73' },
+        { id:'SHL_EARTH', name:'Earthen Shoulder',       sizeLabel:'Width (m)', defaultSize:'1.5',  unit:'m', boqSuggest:'Earthen shoulder formation & dressing', boqUnit:'RMT', morthRef:'IRC:SP:73' },
+    ]},
+    { group: 'KERB & FOOTPATH', items: [
+        { id:'KERB_RAISE',name:'Kerb (Raised)',           sizeLabel:'Height (m)',defaultSize:'0.15', unit:'m', boqSuggest:'Raised kerb supply & fixing (IRC:SP:41)', boqUnit:'RMT', morthRef:'IRC:SP:41' },
+        { id:'KERB_MOUNT',name:'Kerb (Mountable)',        sizeLabel:'Height (m)',defaultSize:'0.08', unit:'m', boqSuggest:'Mountable kerb supply & fixing', boqUnit:'RMT', morthRef:'IRC:SP:41' },
+        { id:'FOOTPATH',  name:'Footpath / Pavement',    sizeLabel:'Width (m)', defaultSize:'1.5',  unit:'m', boqSuggest:'Footpath construction (CC/paving blocks)', boqUnit:'Sqm', morthRef:'IRC:86' },
+    ]},
+    { group: 'CRASH BARRIERS', items: [
+        { id:'CB_WBEAM',  name:'Crash Barrier — W-Beam', sizeLabel:'Type',      defaultSize:'W2',   unit:'',  boqSuggest:'W-Beam crash barrier supply & erection (IRC:119)', boqUnit:'RMT', morthRef:'IRC:119' },
+        { id:'CB_THRIE',  name:'Crash Barrier — Thrie-Beam',sizeLabel:'Type',   defaultSize:'TB',   unit:'',  boqSuggest:'Thrie-Beam crash barrier supply & erection', boqUnit:'RMT', morthRef:'IRC:119' },
+        { id:'CB_RIGID',  name:'Rigid Barrier (CRCP/PCC)',sizeLabel:'Height (m)',defaultSize:'0.9',  unit:'m', boqSuggest:'Rigid concrete median barrier', boqUnit:'RMT', morthRef:'IRC:119' },
+    ]},
+    { group: 'DRAINAGE', items: [
+        { id:'DRN_LINED', name:'Lined Drain (Trapezoidal)',sizeLabel:'Size (mm)',defaultSize:'600x450',unit:'mm',boqSuggest:'Cement concrete lined drain (trap section)', boqUnit:'RMT', morthRef:'MoRTH Sec 309' },
+        { id:'DRN_BOX',   name:'Box Drain',               sizeLabel:'Size (mm)',defaultSize:'600x600',unit:'mm',boqSuggest:'RCC box drain construction', boqUnit:'RMT', morthRef:'MoRTH Sec 309' },
+        { id:'DRN_CWD',   name:'Catch Water Drain',       sizeLabel:'Depth (m)',defaultSize:'0.6',  unit:'m', boqSuggest:'Catch water drain (hill section)', boqUnit:'RMT', morthRef:'MoRTH Sec 309' },
+        { id:'DRN_PIPE',  name:'Pipe Culvert / Cross Drain',sizeLabel:'Dia (mm)',defaultSize:'900', unit:'mm',boqSuggest:'NP3 hume pipe culvert supply & laying', boqUnit:'RMT', morthRef:'MoRTH Sec 2000' },
+    ]},
+    { group: 'SLOPE PROTECTION', items: [
+        { id:'TOE_WALL',  name:'Toe Wall',                sizeLabel:'Height (m)',defaultSize:'1.0',  unit:'m', boqSuggest:'Masonry toe wall construction', boqUnit:'RMT', morthRef:'MoRTH Sec 2800' },
+        { id:'RW_GRAV',   name:'Retaining Wall (Gravity)',sizeLabel:'Avg H (m)', defaultSize:'3.0',  unit:'m', boqSuggest:'Gravity retaining wall (stone/CC masonry)', boqUnit:'RMT', morthRef:'IRC:78' },
+        { id:'RW_CANT',   name:'Retaining Wall (Cantilever)',sizeLabel:'Avg H (m)',defaultSize:'5.0',unit:'m', boqSuggest:'RCC cantilever retaining wall', boqUnit:'RMT', morthRef:'IRC:78' },
+        { id:'RE_WALL',   name:'Reinforced Earth Wall',   sizeLabel:'Avg H (m)',defaultSize:'6.0',  unit:'m', boqSuggest:'RE wall supply, fabrication & erection (IRC:SP:102)', boqUnit:'Sqm', morthRef:'IRC:SP:102' },
+        { id:'SLOPE_CUT', name:'Cut Slope Treatment',     sizeLabel:'Slope',    defaultSize:'1:1',  unit:'',  boqSuggest:'Cut slope dressing & protection', boqUnit:'Sqm', morthRef:'MoRTH Sec 301' },
+        { id:'SLOPE_FILL',name:'Fill Slope Protection',   sizeLabel:'Slope',    defaultSize:'2:1',  unit:'',  boqSuggest:'Stone pitching on fill slope', boqUnit:'Sqm', morthRef:'MoRTH Sec 2800' },
+    ]},
+    { group: 'MISCELLANEOUS', items: [
+        { id:'PLANT_SIDE',name:'Plantation Strip (Roadside)',sizeLabel:'Width (m)',defaultSize:'2.0',unit:'m', boqSuggest:'Roadside plantation & horticulture', boqUnit:'RMT', morthRef:'MoRTH Sec 309' },
+        { id:'ROAD_FURN', name:'Road Furniture (Signs/Delineators)',sizeLabel:'Nos/km',defaultSize:'12',unit:'',boqSuggest:'Road signs, delineators, OHE markers', boqUnit:'LS', morthRef:'IRC:67' },
+        { id:'MARKINGS',  name:'Road Markings',           sizeLabel:'Coats',    defaultSize:'2',    unit:'',  boqSuggest:'Thermoplastic road markings (IRC:35)', boqUnit:'Sqm', morthRef:'IRC:35' },
+    ]},
+];
 
-        function updateMasterTCS() {
-            const cw  = parseFloat(document.getElementById('tcsCarriageWidth')?.value) || 7.0;
-            const sw  = parseFloat(document.getElementById('tcsShoulderWidth')?.value) || 1.5;
-            const gsb = parseFloat(document.getElementById('tcsGSB')?.value) || 250;
-            const wmm = parseFloat(document.getElementById('tcsWMM')?.value) || 250;
-            const dbm = parseFloat(document.getElementById('tcsDBM')?.value) || 50;
-            const bc  = parseFloat(document.getElementById('tcsBC')?.value)  || 40;
-            const gsbOn = document.getElementById('tcsGSBon')?.checked !== false;
-            const wmmOn = document.getElementById('tcsWMMon')?.checked !== false;
-            const dbmOn = document.getElementById('tcsDBMon')?.checked !== false;
-            const bcOn  = document.getElementById('tcsOnBC')?.checked  !== false;
+// ── IRC STANDARD TEMPLATES ──────────────────────────────────────────────
+const TCS_TEMPLATES = {
+    'NH/SH-4Lane-New': {
+        elements: ['MAIN_CW','MED_RAISED','SHL_PAVED','SHL_EARTH','CB_WBEAM','DRN_LINED','SLOPE_FILL','PLANT_SIDE','ROAD_FURN','MARKINGS'],
+        sizes: { MAIN_CW:'7.0', MED_RAISED:'4.5', SHL_PAVED:'1.5', SHL_EARTH:'1.0' },
+        ref: 'IRC:SP:73 4-Lane NH Standard'
+    },
+    'NH/SH-2Lane-New': {
+        elements: ['MAIN_CW','SHL_PAVED','SHL_EARTH','DRN_LINED','SLOPE_FILL','PLANT_SIDE','ROAD_FURN','MARKINGS'],
+        sizes: { MAIN_CW:'3.5', SHL_PAVED:'1.5', SHL_EARTH:'0.5' },
+        ref: 'IRC:73 2-Lane NH Standard'
+    },
+    'Expressway-6Lane-New': {
+        elements: ['MAIN_CW','MED_RAISED','SHL_PAVED','SHL_EARTH','CB_WBEAM','CB_RIGID','DRN_BOX','RE_WALL','MARKINGS','ROAD_FURN'],
+        sizes: { MAIN_CW:'10.5', MED_RAISED:'12.0', SHL_PAVED:'2.5', SHL_EARTH:'1.5' },
+        ref: 'NHAI Expressway Standard (2×3 Lane)'
+    },
+    'Urban-4Lane-New': {
+        elements: ['MAIN_CW','MED_RAISED','KERB_RAISE','FOOTPATH','SERVICE','DRN_BOX','MARKINGS','ROAD_FURN','PLANT_SIDE'],
+        sizes: { MAIN_CW:'7.0', MED_RAISED:'3.0', FOOTPATH:'2.0', SERVICE:'3.5' },
+        ref: 'IRC:86 Urban Road Standard'
+    },
+    'MDR-2Lane-New': {
+        elements: ['MAIN_CW','SHL_EARTH','DRN_LINED','PLANT_SIDE','MARKINGS'],
+        sizes: { MAIN_CW:'3.0', SHL_EARTH:'1.0' },
+        ref: 'IRC:73 MDR Standard'
+    },
+};
 
-            KALYANTRA.data.tcs.carriageWidth  = cw;
-            KALYANTRA.data.tcs.shoulderWidth  = sw;
-            if (!KALYANTRA.data.tcs.layers) KALYANTRA.data.tcs.layers = {};
-            if (gsbOn) KALYANTRA.data.tcs.layers.GSB = { thickness: gsb, material: 'Granular Sub Base' };
-            else delete KALYANTRA.data.tcs.layers.GSB;
-            if (wmmOn) KALYANTRA.data.tcs.layers.WMM = { thickness: wmm, material: 'Wet Mix Macadam' };
-            else delete KALYANTRA.data.tcs.layers.WMM;
-            if (dbmOn) KALYANTRA.data.tcs.layers.DBM = { thickness: dbm, material: 'Dense Bituminous Macadam' };
-            else delete KALYANTRA.data.tcs.layers.DBM;
-            if (bcOn)  KALYANTRA.data.tcs.layers.BC  = { thickness: bc,  material: 'Bituminous Concrete' };
-            else delete KALYANTRA.data.tcs.layers.BC;
+// ── CHIP SELECTOR ───────────────────────────────────────────────────────
+function tcsChip(btn, groupId, value) {
+    document.querySelectorAll('#'+groupId+' .tcs-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const key = groupId === 'tcsRoadCategory' ? 'roadCategory' :
+                groupId === 'tcsLaneType'     ? 'laneType' :
+                groupId === 'tcsConstType'    ? 'constType' : groupId;
+    if (!KALYANTRA.data.tcs.classification) KALYANTRA.data.tcs.classification = {};
+    KALYANTRA.data.tcs.classification[key] = value;
+    KALYANTRA.save();
+}
 
-            KALYANTRA.save();
-        }
-
-        function populateMasterTCSForm() {
-            const tcs = KALYANTRA.data.tcs || {};
-            const setV = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.value = v; };
-            const setC = (id, v) => { const el = document.getElementById(id); if (el) el.checked = v !== false; };
-            setV('tcsCarriageWidth', tcs.carriageWidth || 7.0);
-            setV('tcsShoulderWidth', tcs.shoulderWidth || 1.5);
-            const layers = tcs.layers || {};
-            setV('tcsGSB', layers.GSB?.thickness || 250); setC('tcsGSBon', !!layers.GSB);
-            setV('tcsWMM', layers.WMM?.thickness || 250); setC('tcsWMMon', !!layers.WMM);
-            setV('tcsDBM', layers.DBM?.thickness || 50);  setC('tcsDBMon', !!layers.DBM);
-            setV('tcsBC',  layers.BC?.thickness  || 40);  setC('tcsOnBC',  !!layers.BC);
-        }
-
-        // ── ADD SECTION MODAL (with TCS override) ──────────────────────
-        function tcsAddSection() {
-            const p   = KALYANTRA.data.project || {};
-            const tcs = KALYANTRA.data.tcs || {};
-            showTCSSectionModal(-1, {
-                name: 'Road Works',
-                fromCh: p.startChainage || 0,
-                toCh: p.endChainage || 5000,
-                itemSystem: 'morth',
-                items: [], linearItems: [],
-                // TCS override — copies master by default
-                tcs: {
-                    carriageWidth: tcs.carriageWidth || 7.0,
-                    shoulderWidth: tcs.shoulderWidth || 1.5,
-                    layers: JSON.parse(JSON.stringify(tcs.layers || {}))
-                }
-            });
-        }
-
-        function tcsEditSection(si) {
-            const sec = (KALYANTRA.data.boq?.sections || [])[si];
-            if (sec) showTCSSectionModal(si, sec);
-        }
-
-        function showTCSSectionModal(si, sec) {
-            const existing = document.getElementById('tcsSectionModal');
-            if (existing) existing.remove();
-            const tcs = sec.tcs || KALYANTRA.data.tcs || {};
-            const layers = tcs.layers || {};
-            const modal = document.createElement('div');
-            modal.id = 'tcsSectionModal';
-            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;';
-            modal.innerHTML = `
-            <div style="background:#fff;border-radius:10px;padding:24px;width:560px;max-width:96vw;box-shadow:0 20px 60px rgba(0,0,0,0.3);max-height:92vh;overflow-y:auto;">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-                    <div style="font-weight:700;color:var(--navy);font-size:1rem;">${si===-1?'➕ Add New Section':'✏️ Edit Section'}</div>
-                    <button onclick="document.getElementById('tcsSectionModal').remove()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-secondary);">✕</button>
-                </div>
-
-                <!-- SECTION INFO -->
-                <div style="background:#f8fafc;border-radius:8px;padding:14px;margin-bottom:14px;">
-                    <div style="font-size:0.78rem;font-weight:700;color:var(--navy);margin-bottom:10px;">SECTION DETAILS</div>
-                    <div style="display:grid;gap:10px;">
-                        <div>
-                            <label style="font-size:0.75rem;font-weight:600;color:var(--navy);display:block;margin-bottom:3px;">Section Name</label>
-                            <input id="tsmName" type="text" value="${sec.name||''}" placeholder="e.g. Road Works, Hill Section, Urban Stretch"
-                                style="width:100%;padding:7px 10px;border:1px solid var(--border-medium);border-radius:5px;font-size:0.84rem;box-sizing:border-box;">
-                        </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-                            <div>
-                                <label style="font-size:0.75rem;font-weight:600;color:var(--navy);display:block;margin-bottom:3px;">From Chainage</label>
-                                <input id="tsmFromCh" type="text" value="${fmtCh(sec.fromCh||0)}" placeholder="0+000"
-                                    style="width:100%;padding:7px 10px;border:1px solid var(--border-medium);border-radius:5px;font-size:0.84rem;box-sizing:border-box;">
-                            </div>
-                            <div>
-                                <label style="font-size:0.75rem;font-weight:600;color:var(--navy);display:block;margin-bottom:3px;">To Chainage</label>
-                                <input id="tsmToCh" type="text" value="${fmtCh(sec.toCh||0)}" placeholder="5+000"
-                                    style="width:100%;padding:7px 10px;border:1px solid var(--border-medium);border-radius:5px;font-size:0.84rem;box-sizing:border-box;">
-                            </div>
-                            <div>
-                                <label style="font-size:0.75rem;font-weight:600;color:var(--navy);display:block;margin-bottom:3px;">Item Numbering</label>
-                                <select id="tsmItemSystem" style="width:100%;padding:7px 10px;border:1px solid var(--border-medium);border-radius:5px;font-size:0.84rem;box-sizing:border-box;">
-                                    <option value="morth" ${sec.itemSystem==='morth'?'selected':''}>MoRTH</option>
-                                    <option value="cpwd"  ${sec.itemSystem==='cpwd'?'selected':''}>CPWD</option>
-                                    <option value="own"   ${sec.itemSystem==='own'?'selected':''}>Own</option>
-                                    <option value="auto"  ${sec.itemSystem==='auto'?'selected':''}>Auto</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TCS OVERRIDE -->
-                <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px;margin-bottom:14px;">
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-                        <div style="font-size:0.78rem;font-weight:700;color:#1d4ed8;">TCS FOR THIS SECTION</div>
-                        <button onclick="tsmCopyMaster()" style="background:#dbeafe;color:#1d4ed8;border:none;padding:3px 10px;border-radius:4px;font-size:0.72rem;cursor:pointer;font-weight:600;">↩ Copy Master TCS</button>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                        <div>
-                            <label style="font-size:0.73rem;font-weight:600;color:#1e40af;display:block;margin-bottom:3px;">Carriage Width (m)</label>
-                            <input id="tsmCW" type="number" value="${tcs.carriageWidth||7.0}" step="0.5"
-                                style="width:100%;padding:6px 9px;border:1px solid #bfdbfe;border-radius:4px;font-size:0.83rem;box-sizing:border-box;">
-                        </div>
-                        <div>
-                            <label style="font-size:0.73rem;font-weight:600;color:#1e40af;display:block;margin-bottom:3px;">Shoulder Width (m)</label>
-                            <input id="tsmSW" type="number" value="${tcs.shoulderWidth||1.5}" step="0.25"
-                                style="width:100%;padding:6px 9px;border:1px solid #bfdbfe;border-radius:4px;font-size:0.83rem;box-sizing:border-box;">
-                        </div>
-                    </div>
-                    <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
-                        <thead><tr style="background:#dbeafe;color:#1e40af;">
-                            <th style="padding:5px 8px;text-align:left;">Layer</th>
-                            <th style="padding:5px 8px;text-align:center;">Thickness (mm)</th>
-                            <th style="padding:5px 8px;text-align:center;">Include</th>
-                        </tr></thead>
-                        <tbody>
-                            <tr style="border-bottom:1px solid #e0f2fe;">
-                                <td style="padding:5px 8px;font-weight:700;color:#92400e;">GSB</td>
-                                <td style="padding:5px 8px;text-align:center;"><input type="number" id="tsmGSB" value="${layers.GSB?.thickness||250}" style="width:70px;padding:3px 6px;border:1px solid #bfdbfe;border-radius:3px;text-align:center;font-size:0.78rem;"></td>
-                                <td style="padding:5px 8px;text-align:center;"><input type="checkbox" id="tsmGSBon" ${layers.GSB?'checked':''}></td>
-                            </tr>
-                            <tr style="border-bottom:1px solid #e0f2fe;">
-                                <td style="padding:5px 8px;font-weight:700;color:#1d4ed8;">WMM</td>
-                                <td style="padding:5px 8px;text-align:center;"><input type="number" id="tsmWMM" value="${layers.WMM?.thickness||250}" style="width:70px;padding:3px 6px;border:1px solid #bfdbfe;border-radius:3px;text-align:center;font-size:0.78rem;"></td>
-                                <td style="padding:5px 8px;text-align:center;"><input type="checkbox" id="tsmWMMon" ${layers.WMM?'checked':''}></td>
-                            </tr>
-                            <tr style="border-bottom:1px solid #e0f2fe;">
-                                <td style="padding:5px 8px;font-weight:700;color:#1e40af;">DBM</td>
-                                <td style="padding:5px 8px;text-align:center;"><input type="number" id="tsmDBM" value="${layers.DBM?.thickness||50}" style="width:70px;padding:3px 6px;border:1px solid #bfdbfe;border-radius:3px;text-align:center;font-size:0.78rem;"></td>
-                                <td style="padding:5px 8px;text-align:center;"><input type="checkbox" id="tsmDBMon" ${layers.DBM?'checked':''}></td>
-                            </tr>
-                            <tr>
-                                <td style="padding:5px 8px;font-weight:700;">BC</td>
-                                <td style="padding:5px 8px;text-align:center;"><input type="number" id="tsmBC" value="${layers.BC?.thickness||40}" style="width:70px;padding:3px 6px;border:1px solid #bfdbfe;border-radius:3px;text-align:center;font-size:0.78rem;"></td>
-                                <td style="padding:5px 8px;text-align:center;"><input type="checkbox" id="tsmBCon" ${layers.BC?'checked':''}></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div style="display:flex;gap:10px;justify-content:flex-end;">
-                    <button onclick="document.getElementById('tcsSectionModal').remove()"
-                        style="padding:8px 16px;border:1px solid var(--border-medium);background:#fff;border-radius:5px;cursor:pointer;font-size:0.83rem;">Cancel</button>
-                    <button onclick="tsmSave(${si})"
-                        style="padding:8px 20px;background:var(--navy);color:var(--accent-gold);border:none;border-radius:5px;font-weight:700;cursor:pointer;font-size:0.85rem;">
-                        ${si===-1?'✅ Add Section':'✅ Save Changes'}
-                    </button>
-                </div>
-            </div>`;
-            document.body.appendChild(modal);
-        }
-
-        function tsmCopyMaster() {
-            const tcs = KALYANTRA.data.tcs || {};
-            const layers = tcs.layers || {};
-            const setV = (id,v) => { const el=document.getElementById(id); if(el) el.value=v; };
-            const setC = (id,v) => { const el=document.getElementById(id); if(el) el.checked=!!v; };
-            setV('tsmCW', tcs.carriageWidth||7.0);
-            setV('tsmSW', tcs.shoulderWidth||1.5);
-            setV('tsmGSB', layers.GSB?.thickness||250); setC('tsmGSBon', !!layers.GSB);
-            setV('tsmWMM', layers.WMM?.thickness||250); setC('tsmWMMon', !!layers.WMM);
-            setV('tsmDBM', layers.DBM?.thickness||50);  setC('tsmDBMon', !!layers.DBM);
-            setV('tsmBC',  layers.BC?.thickness||40);   setC('tsmBCon',  !!layers.BC);
-            showToast('↩ Master TCS copied to section', 'info');
-        }
-
-        function tsmSave(si) {
-            const name  = document.getElementById('tsmName').value.trim() || 'Road Works';
-            const fromCh = parseCh(document.getElementById('tsmFromCh').value);
-            const toCh   = parseCh(document.getElementById('tsmToCh').value);
-            const itemSystem = document.getElementById('tsmItemSystem').value;
-            // Read section TCS
-            const gsbOn = document.getElementById('tsmGSBon').checked;
-            const wmmOn = document.getElementById('tsmWMMon').checked;
-            const dbmOn = document.getElementById('tsmDBMon').checked;
-            const bcOn  = document.getElementById('tsmBCon').checked;
-            const secLayers = {};
-            if (gsbOn) secLayers.GSB = { thickness: parseFloat(document.getElementById('tsmGSB').value)||250, material:'Granular Sub Base' };
-            if (wmmOn) secLayers.WMM = { thickness: parseFloat(document.getElementById('tsmWMM').value)||250, material:'Wet Mix Macadam' };
-            if (dbmOn) secLayers.DBM = { thickness: parseFloat(document.getElementById('tsmDBM').value)||50,  material:'Dense Bituminous Macadam' };
-            if (bcOn)  secLayers.BC  = { thickness: parseFloat(document.getElementById('tsmBC').value)||40,   material:'Bituminous Concrete' };
-            const secTCS = {
-                carriageWidth: parseFloat(document.getElementById('tsmCW').value)||7.0,
-                shoulderWidth: parseFloat(document.getElementById('tsmSW').value)||1.5,
-                layers: secLayers
+// ── LOAD IRC TEMPLATE ────────────────────────────────────────────────────
+function tcsLoadTemplate() {
+    const cls = KALYANTRA.data.tcs.classification || {};
+    const cat  = cls.roadCategory || 'NH/SH';
+    const lane = cls.laneType     || '4-Lane';
+    const type = cls.constType    || 'New';
+    const tkey = cat.replace('/','/')+'-'+lane.replace(' Divided','').replace('-Lane','-Lane')+'-'+type;
+    const tmpl = TCS_TEMPLATES[tkey] || TCS_TEMPLATES['NH/SH-4Lane-New'];
+    // Apply template elements
+    if (!KALYANTRA.data.tcs.elements) KALYANTRA.data.tcs.elements = {};
+    tmpl.elements.forEach(id => {
+        const el = TCS_ELEMENTS.flatMap(g => g.items).find(i => i.id === id);
+        if (el) {
+            KALYANTRA.data.tcs.elements[id] = {
+                included: true,
+                size: (tmpl.sizes && tmpl.sizes[id]) || el.defaultSize
             };
-            if (!KALYANTRA.data.boq) KALYANTRA.data.boq = {sections:[],structureBOQ:[],generationConfig:{sequence:[],productivityRates:{},confirmed:false}};
-            if (!KALYANTRA.data.boq.sections) KALYANTRA.data.boq.sections = [];
-            if (si === -1) {
-                KALYANTRA.data.boq.sections.push({ name, fromCh, toCh, itemSystem, items:[], linearItems:[], tcs:secTCS });
-            } else {
-                const existing = KALYANTRA.data.boq.sections[si] || {};
-                KALYANTRA.data.boq.sections[si] = { ...existing, name, fromCh, toCh, itemSystem, tcs:secTCS };
-            }
-            KALYANTRA.save();
-            document.getElementById('tcsSectionModal').remove();
-            renderBOQSections();
-            showToast(si===-1?'✅ Section added':'✅ Section updated', 'success');
         }
+    });
+    KALYANTRA.save();
+    renderTCSElements();
+    showToast('✅ Template loaded: ' + tmpl.ref, 'success');
+}
 
-        // Override boqEditSection to use our new modal
-        function boqEditSection(si) { tcsEditSection(si); }
+// ── RENDER TCS ELEMENT GRID ──────────────────────────────────────────────
+function renderTCSElements() {
+    const grid = document.getElementById('tcsElementsGrid');
+    if (!grid) return;
+    const stored = KALYANTRA.data.tcs.elements || {};
+    let html = '';
+    TCS_ELEMENTS.forEach(group => {
+        html += `<div class="tcs-element-group">
+            <div class="tcs-group-label">${group.group}</div>`;
+        group.items.forEach(item => {
+            const st   = stored[item.id] || {};
+            const chkd = st.included === true;
+            const size = st.size !== undefined ? st.size : item.defaultSize;
+            html += `<div class="tcs-element-row ${chkd?'checked':''}" id="tcsrow_${item.id}">
+                <input type="checkbox" ${chkd?'checked':''} onchange="tcsToggleElement('${item.id}',this.checked)">
+                <div class="tcs-elem-name ${chkd?'':'disabled'}">${item.name}</div>
+                <div class="tcs-elem-size">
+                    <input type="text" value="${size}" placeholder="${item.sizeLabel}"
+                        title="${item.sizeLabel}"
+                        onchange="tcsUpdateSize('${item.id}',this.value)"
+                        style="${chkd?'':'opacity:0.4;pointer-events:none;'}">
+                </div>
+                <div class="tcs-elem-unit">${item.unit || item.sizeLabel}</div>
+                <div class="tcs-elem-boq">${chkd ? '→ BOQ: '+item.boqUnit+' <span style="color:#94a3b8;font-size:0.65rem;">'+item.morthRef+'</span>' : ''}</div>
+            </div>`;
+        });
+        html += '</div>';
+    });
+    grid.innerHTML = html;
+}
 
-        // Render structures list in Part C
-        function renderStructuresBOQList() {
-            const structBOQ = KALYANTRA.data.boq?.structureBOQ || [];
-            const container = document.getElementById('boqStructuresList');
-            const emptyEl   = document.getElementById('boqStructEmptyState');
-            if (!container) return;
-            if (structBOQ.length === 0) {
-                if (emptyEl) emptyEl.style.display = 'block';
-                return;
-            }
-            if (emptyEl) emptyEl.style.display = 'none';
-            const structures = KALYANTRA.data.structures || [];
-            let html = '';
-            structBOQ.forEach((sb, si) => {
-                const struct = structures.find(s => s.id == sb.structureId) || {};
-                const total  = (sb.items||[]).reduce((s,it) => s+(it.qty||0)*(it.rate||0), 0);
-                html += `<div style="background:var(--bg-surface);border:1px solid #ddd6fe;border-radius:6px;padding:12px;margin-bottom:8px;border-left:4px solid #7c3aed;">
-                    <div style="display:flex;align-items:center;justify-content:space-between;">
-                        <div>
-                            <div style="font-weight:700;color:var(--navy);font-size:0.88rem;">🌉 ${struct.name||sb.structureName||'Structure'}</div>
-                            <div style="font-size:0.72rem;color:var(--text-secondary);">Ch ${fmtCh(struct.chainage||sb.chainage||0)} — ${(sb.items||[]).length} items — ₹${(total/100000).toFixed(2)}L</div>
-                        </div>
-                        <div style="display:flex;gap:6px;">
-                            <button onclick="boqViewStructure(${si})" style="background:#ede9fe;color:#7c3aed;border:none;padding:4px 10px;border-radius:4px;font-size:0.72rem;cursor:pointer;">👁️ View</button>
-                            <button onclick="boqDeleteStructure(${si})" style="background:#fee2e2;color:#dc2626;border:none;padding:4px 10px;border-radius:4px;font-size:0.72rem;cursor:pointer;">🗑️</button>
-                        </div>
-                    </div>
-                    <div id="boqStructDetails_${si}" style="display:none;margin-top:10px;">${renderStructureBOQTable(sb)}</div>
-                </div>`;
-            });
-            container.innerHTML = html;
+function tcsToggleElement(id, checked) {
+    if (!KALYANTRA.data.tcs.elements) KALYANTRA.data.tcs.elements = {};
+    const el = TCS_ELEMENTS.flatMap(g=>g.items).find(i=>i.id===id);
+    if (!KALYANTRA.data.tcs.elements[id]) KALYANTRA.data.tcs.elements[id] = { size: el ? el.defaultSize : '' };
+    KALYANTRA.data.tcs.elements[id].included = checked;
+    KALYANTRA.save();
+    renderTCSElements();
+}
+
+function tcsUpdateSize(id, val) {
+    if (!KALYANTRA.data.tcs.elements) KALYANTRA.data.tcs.elements = {};
+    if (!KALYANTRA.data.tcs.elements[id]) KALYANTRA.data.tcs.elements[id] = {};
+    KALYANTRA.data.tcs.elements[id].size = val;
+    KALYANTRA.save();
+}
+
+// ── SECTION MODAL WITH BOQ SUGGESTIONS ──────────────────────────────────
+function tcsAddSection() {
+    const p = KALYANTRA.data.project || {};
+    showTCSSectionModal(-1, {
+        name:'Road Works', fromCh: p.startChainage||0, toCh: p.endChainage||5000,
+        itemSystem:'morth', items:[], linearItems:[]
+    });
+}
+function tcsEditSection(si) {
+    const sec = (KALYANTRA.data.boq?.sections||[])[si];
+    if (sec) showTCSSectionModal(si, sec);
+}
+function boqEditSection(si) { tcsEditSection(si); }
+
+function showTCSSectionModal(si, sec) {
+    const ex = document.getElementById('tcsSectionModal'); if(ex) ex.remove();
+    // Get checked TCS elements to suggest BOQ items
+    const checked = TCS_ELEMENTS.flatMap(g=>g.items)
+        .filter(i => (KALYANTRA.data.tcs.elements||{})[i.id]?.included);
+    const boqItems = sec.items || [];
+    // Build existing BOQ table rows
+    const existingRows = boqItems.map((it,ii) => `
+        <tr id="boqrow_${ii}">
+            <td style="padding:4px 6px;font-size:0.75rem;">${it.itemNo||'-'}</td>
+            <td style="padding:4px 6px;font-size:0.75rem;font-weight:600;">${it.description||'-'}</td>
+            <td style="padding:4px 6px;text-align:center;font-size:0.75rem;">${it.unit||'-'}</td>
+            <td style="padding:4px 6px;text-align:right;"><input type="number" value="${it.rate||''}" placeholder="0" onchange="tsmUpdateRate(${ii},this.value)" style="width:80px;padding:3px 6px;border:1px solid var(--border-light);border-radius:3px;font-size:0.75rem;text-align:right;"></td>
+            <td style="padding:4px 6px;text-align:center;"><button onclick="tsmDeleteItem(${ii})" style="background:#fee2e2;color:#dc2626;border:none;padding:2px 7px;border-radius:3px;font-size:0.7rem;cursor:pointer;">✕</button></td>
+        </tr>`).join('');
+
+    // Build suggestions from TCS elements not yet in BOQ
+    const existingDescs = boqItems.map(i => i.description);
+    const suggestions = checked.filter(el => !existingDescs.some(d => d.includes(el.name.substring(0,10))));
+    const suggRows = suggestions.map(el => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;margin-bottom:4px;">
+            <div>
+                <span style="font-weight:600;font-size:0.78rem;color:#166534;">${el.name}</span>
+                <span style="font-size:0.68rem;color:#16a34a;margin-left:6px;">→ ${el.boqUnit} | ${el.morthRef}</span>
+            </div>
+            <button onclick="tsmAcceptSuggestion('${el.id}')" style="background:#16a34a;color:#fff;border:none;padding:3px 10px;border-radius:4px;font-size:0.72rem;cursor:pointer;font-weight:600;">+ Add</button>
+        </div>`).join('');
+
+    const modal = document.createElement('div');
+    modal.id = 'tcsSectionModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML = `
+    <div style="background:#fff;border-radius:10px;padding:24px;width:680px;max-width:97vw;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div style="font-weight:700;color:var(--navy);font-size:1rem;">${si===-1?'➕ Add Section':'✏️ Edit Section'}</div>
+            <button onclick="document.getElementById('tcsSectionModal').remove()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;">✕</button>
+        </div>
+
+        <!-- Section header fields -->
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px;background:#f8fafc;padding:12px;border-radius:8px;">
+            <div>
+                <label style="font-size:0.73rem;font-weight:700;color:var(--navy);display:block;margin-bottom:3px;">Section Name</label>
+                <input id="tsmName" type="text" value="${sec.name||''}" placeholder="e.g. Road Works, Hill Section"
+                    style="width:100%;padding:6px 9px;border:1px solid var(--border-medium);border-radius:4px;font-size:0.83rem;box-sizing:border-box;">
+            </div>
+            <div>
+                <label style="font-size:0.73rem;font-weight:700;color:var(--navy);display:block;margin-bottom:3px;">From Chainage</label>
+                <input id="tsmFromCh" type="text" value="${fmtCh(sec.fromCh||0)}"
+                    style="width:100%;padding:6px 9px;border:1px solid var(--border-medium);border-radius:4px;font-size:0.83rem;box-sizing:border-box;">
+            </div>
+            <div>
+                <label style="font-size:0.73rem;font-weight:700;color:var(--navy);display:block;margin-bottom:3px;">To Chainage</label>
+                <input id="tsmToCh" type="text" value="${fmtCh(sec.toCh||0)}"
+                    style="width:100%;padding:6px 9px;border:1px solid var(--border-medium);border-radius:4px;font-size:0.83rem;box-sizing:border-box;">
+            </div>
+            <div>
+                <label style="font-size:0.73rem;font-weight:700;color:var(--navy);display:block;margin-bottom:3px;">Item System</label>
+                <select id="tsmItemSystem" style="width:100%;padding:6px 9px;border:1px solid var(--border-medium);border-radius:4px;font-size:0.83rem;box-sizing:border-box;">
+                    <option value="morth" ${sec.itemSystem==='morth'?'selected':''}>MoRTH</option>
+                    <option value="cpwd"  ${sec.itemSystem==='cpwd'?'selected':''}>CPWD</option>
+                    <option value="own"   ${sec.itemSystem==='own'?'selected':''}>Own</option>
+                    <option value="auto"  ${sec.itemSystem==='auto'?'selected':''}>Auto</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- BOQ Suggestions from TCS elements -->
+        ${suggestions.length > 0 ? `<div style="margin-bottom:14px;">
+            <div style="font-size:0.76rem;font-weight:700;color:#16a34a;margin-bottom:6px;">
+                💡 Suggested from TCS Elements (${suggestions.length} items) — click + Add to include:
+            </div>
+            <div id="tsmSuggestions">${suggRows}</div>
+        </div>` : ''}
+
+        <!-- BOQ Items table -->
+        <div>
+            <div style="font-size:0.76rem;font-weight:700;color:var(--navy);margin-bottom:6px;">
+                📦 BOQ Items for this Section
+                <span style="font-weight:400;color:var(--text-secondary);font-size:0.7rem;"> — enter Rate only, Amount = Rate × section length</span>
+            </div>
+            <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:0.78rem;" id="tsmItemsTable">
+                <thead><tr style="background:var(--navy);color:#fff;">
+                    <th style="padding:6px 8px;text-align:left;">Item No</th>
+                    <th style="padding:6px 8px;text-align:left;">Description</th>
+                    <th style="padding:6px 8px;text-align:center;">Unit</th>
+                    <th style="padding:6px 8px;text-align:right;">Rate (₹)</th>
+                    <th style="padding:6px 8px;width:40px;"></th>
+                </tr></thead>
+                <tbody id="tsmItemsBody">${existingRows}</tbody>
+            </table>
+            </div>
+            <button onclick="tsmAddCustomItem()" style="margin-top:8px;background:#e0f2fe;color:#0369a1;border:none;padding:5px 12px;border-radius:4px;font-size:0.75rem;font-weight:600;cursor:pointer;">+ Add Custom Item</button>
+        </div>
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+            <button onclick="document.getElementById('tcsSectionModal').remove()"
+                style="padding:8px 16px;border:1px solid var(--border-medium);background:#fff;border-radius:5px;cursor:pointer;font-size:0.83rem;">Cancel</button>
+            <button onclick="tsmSave(${si})"
+                style="padding:8px 20px;background:var(--navy);color:var(--accent-gold);border:none;border-radius:5px;font-weight:700;cursor:pointer;font-size:0.85rem;">
+                ${si===-1?'✅ Add Section':'✅ Save Changes'}
+            </button>
+        </div>
+    </div>`;
+    document.body.appendChild(modal);
+    // Store current section index for item editing
+    window._tsmSI = si;
+    window._tsmItems = JSON.parse(JSON.stringify(boqItems));
+}
+
+function tsmAcceptSuggestion(elemId) {
+    const el = TCS_ELEMENTS.flatMap(g=>g.items).find(i=>i.id===elemId);
+    if (!el) return;
+    // Auto item number
+    const itemNo = String((window._tsmItems||[]).length + 1).padStart(3,'0');
+    const item = { itemNo, description: el.name + ' (' + el.morthRef + ')', unit: el.boqUnit, rate: 0, activityLink: elemId };
+    if (!window._tsmItems) window._tsmItems = [];
+    window._tsmItems.push(item);
+    // Rebuild table and remove from suggestions
+    const tbody = document.getElementById('tsmItemsBody');
+    if (tbody) {
+        const ii = window._tsmItems.length - 1;
+        const tr = document.createElement('tr');
+        tr.id = 'boqrow_'+ii;
+        tr.innerHTML = `
+            <td style="padding:4px 6px;font-size:0.75rem;">${item.itemNo}</td>
+            <td style="padding:4px 6px;font-size:0.75rem;font-weight:600;">${item.description}</td>
+            <td style="padding:4px 6px;text-align:center;font-size:0.75rem;">${item.unit}</td>
+            <td style="padding:4px 6px;text-align:right;"><input type="number" value="" placeholder="0" onchange="tsmUpdateRate(${ii},this.value)" style="width:80px;padding:3px 6px;border:1px solid var(--border-light);border-radius:3px;font-size:0.75rem;text-align:right;"></td>
+            <td style="padding:4px 6px;text-align:center;"><button onclick="tsmDeleteItem(${ii})" style="background:#fee2e2;color:#dc2626;border:none;padding:2px 7px;border-radius:3px;font-size:0.7rem;cursor:pointer;">✕</button></td>`;
+        tbody.appendChild(tr);
+    }
+    // Remove from suggestions panel
+    const suggsDiv = document.getElementById('tsmSuggestions');
+    if (suggsDiv) {
+        const rows = suggsDiv.querySelectorAll('div');
+        rows.forEach(r => { if (r.textContent.includes(el.name.substring(0,15))) r.remove(); });
+    }
+    showToast('+ '+el.name+' added to BOQ', 'success');
+}
+
+function tsmAddCustomItem() {
+    if (!window._tsmItems) window._tsmItems = [];
+    const ii = window._tsmItems.length;
+    const item = { itemNo: String(ii+1).padStart(3,'0'), description:'', unit:'RMT', rate:0 };
+    window._tsmItems.push(item);
+    const tbody = document.getElementById('tsmItemsBody');
+    if (!tbody) return;
+    const tr = document.createElement('tr');
+    tr.id = 'boqrow_'+ii;
+    tr.innerHTML = `
+        <td style="padding:4px 6px;"><input type="text" value="${item.itemNo}" onchange="tsmUpdateField(${ii},'itemNo',this.value)" style="width:55px;padding:3px 5px;border:1px solid var(--border-light);border-radius:3px;font-size:0.75rem;"></td>
+        <td style="padding:4px 6px;"><input type="text" placeholder="Description" onchange="tsmUpdateField(${ii},'description',this.value)" style="width:200px;padding:3px 5px;border:1px solid var(--border-light);border-radius:3px;font-size:0.75rem;"></td>
+        <td style="padding:4px 6px;text-align:center;"><select onchange="tsmUpdateField(${ii},'unit',this.value)" style="padding:3px 5px;border:1px solid var(--border-light);border-radius:3px;font-size:0.73rem;"><option>RMT</option><option>Sqm</option><option>Cum</option><option>MT</option><option>Nos</option><option>LS</option></select></td>
+        <td style="padding:4px 6px;text-align:right;"><input type="number" placeholder="0" onchange="tsmUpdateRate(${ii},this.value)" style="width:80px;padding:3px 6px;border:1px solid var(--border-light);border-radius:3px;font-size:0.75rem;text-align:right;"></td>
+        <td style="padding:4px 6px;text-align:center;"><button onclick="tsmDeleteItem(${ii})" style="background:#fee2e2;color:#dc2626;border:none;padding:2px 7px;border-radius:3px;font-size:0.7rem;cursor:pointer;">✕</button></td>`;
+    tbody.appendChild(tr);
+    tr.querySelector('input[type=text]')?.focus();
+}
+
+function tsmUpdateRate(ii, val) { if (window._tsmItems && window._tsmItems[ii]) window._tsmItems[ii].rate = parseFloat(val)||0; }
+function tsmUpdateField(ii, field, val) { if (window._tsmItems && window._tsmItems[ii]) window._tsmItems[ii][field] = val; }
+function tsmDeleteItem(ii) {
+    if (window._tsmItems) window._tsmItems.splice(ii, 1);
+    const row = document.getElementById('boqrow_'+ii);
+    if (row) row.remove();
+}
+
+function tsmSave(si) {
+    const name  = document.getElementById('tsmName')?.value.trim() || 'Road Works';
+    const fromCh = parseCh(document.getElementById('tsmFromCh')?.value);
+    const toCh   = parseCh(document.getElementById('tsmToCh')?.value);
+    const itemSystem = document.getElementById('tsmItemSystem')?.value || 'morth';
+    const items = (window._tsmItems||[]).filter(i => i.description);
+    if (!KALYANTRA.data.boq) KALYANTRA.data.boq = {sections:[],structureBOQ:[],generationConfig:{sequence:[],productivityRates:{},confirmed:false}};
+    if (!KALYANTRA.data.boq.sections) KALYANTRA.data.boq.sections = [];
+    const secData = { name, fromCh, toCh, itemSystem, items, linearItems: si>=0 ? (KALYANTRA.data.boq.sections[si]?.linearItems||[]) : [] };
+    if (si === -1) KALYANTRA.data.boq.sections.push(secData);
+    else KALYANTRA.data.boq.sections[si] = secData;
+    KALYANTRA.save();
+    document.getElementById('tcsSectionModal').remove();
+    renderBOQSections();
+    showToast(si===-1?'✅ Section added':'✅ Section updated','success');
+}
+
+function boqDeleteSection(si) {
+    if (!confirm('Delete this section and all its BOQ items?')) return;
+    KALYANTRA.data.boq.sections.splice(si,1);
+    KALYANTRA.save(); renderBOQSections();
+    showToast('🗑️ Section deleted','info');
+}
+
+// ── POPULATE CLASSIFICATION CHIPS ON LOAD ───────────────────────────────
+function populateTCSClassification() {
+    const cls = KALYANTRA.data.tcs?.classification || {};
+    const setChip = (groupId, val) => {
+        if (!val) return;
+        document.querySelectorAll('#'+groupId+' .tcs-chip').forEach(b => {
+            b.classList.toggle('active', b.textContent.trim() === val || b.textContent.trim().startsWith(val));
+        });
+    };
+    setChip('tcsRoadCategory', cls.roadCategory);
+    setChip('tcsLaneType', cls.laneType);
+    setChip('tcsConstType', cls.constType);
+    renderTCSElements();
+}
+
+// ── STRUCTURE BOQ — NOW INSIDE STRUCTURES TAB ───────────────────────────
+function renderStructureBOQInline(structIdx) {
+    const struct  = KALYANTRA.data.structures[structIdx];
+    if (!struct) return;
+    const allBOQ  = KALYANTRA.data.boq?.structureBOQ || [];
+    const sbEntry = allBOQ.find(sb => sb.structureId == struct.id) || { structureId:struct.id, items:[] };
+    const items   = sbEntry.items || [];
+    const panelId = 'structBOQPanel_'+structIdx;
+    let panel     = document.getElementById(panelId);
+    if (!panel) return;
+    const total   = items.reduce((s,i)=>s+(i.qty||0)*(i.rate||0),0);
+    const rows    = items.map((it,ii) => `<tr>
+        <td style="padding:4px 7px;font-size:0.75rem;">${it.itemNo||'-'}</td>
+        <td style="padding:4px 7px;font-size:0.78rem;font-weight:600;">${it.description||'-'}</td>
+        <td style="padding:4px 7px;text-align:center;font-size:0.75rem;">${it.unit||'-'}</td>
+        <td style="padding:4px 7px;text-align:right;font-size:0.75rem;">${(it.qty||0).toLocaleString()}</td>
+        <td style="padding:4px 7px;text-align:right;font-size:0.75rem;">₹${(it.rate||0).toLocaleString()}</td>
+        <td style="padding:4px 7px;text-align:right;font-weight:700;font-size:0.75rem;">₹${((it.qty||0)*(it.rate||0)/100000).toFixed(2)}L</td>
+        <td style="padding:4px 7px;text-align:center;"><button onclick="structBOQDeleteItem(${structIdx},${ii})" style="background:#fee2e2;color:#dc2626;border:none;padding:2px 6px;border-radius:3px;font-size:0.7rem;cursor:pointer;">✕</button></td>
+    </tr>`).join('');
+    panel.innerHTML = `<div class="struct-boq-panel">
+        <div style="font-size:0.76rem;font-weight:700;color:#7c3aed;margin-bottom:8px;">📋 Structure BOQ — ${struct.name}</div>
+        ${items.length > 0 ? `<div style="overflow-x:auto;margin-bottom:8px;">
+        <table style="width:100%;border-collapse:collapse;font-size:0.75rem;">
+            <thead><tr style="background:#7c3aed;color:#fff;">
+                <th style="padding:5px 7px;">Item No</th><th style="padding:5px 7px;text-align:left;">Description</th>
+                <th style="padding:5px 7px;text-align:center;">Unit</th><th style="padding:5px 7px;text-align:right;">Qty</th>
+                <th style="padding:5px 7px;text-align:right;">Rate(₹)</th><th style="padding:5px 7px;text-align:right;">Amount</th><th></th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+            <tfoot><tr style="background:#f5f3ff;font-weight:700;">
+                <td colspan="5" style="padding:5px 7px;text-align:right;font-size:0.75rem;">Total:</td>
+                <td style="padding:5px 7px;text-align:right;color:#7c3aed;">₹${(total/100000).toFixed(2)}L</td><td></td>
+            </tr></tfoot>
+        </table></div>` : '<div style="color:var(--text-secondary);font-size:0.78rem;margin-bottom:8px;">No BOQ items yet.</div>'}
+        <button onclick="structBOQAddItem(${structIdx})" style="background:#7c3aed;color:#fff;border:none;padding:5px 12px;border-radius:4px;font-size:0.75rem;font-weight:600;cursor:pointer;">+ Add BOQ Item</button>
+    </div>`;
+}
+
+function structBOQAddItem(structIdx) {
+    const struct = KALYANTRA.data.structures[structIdx];
+    if (!struct) return;
+    const ex = document.getElementById('structBOQItemModal'); if(ex) ex.remove();
+    const modal = document.createElement('div');
+    modal.id = 'structBOQItemModal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML = `
+    <div style="background:#fff;border-radius:10px;padding:22px;width:440px;max-width:96vw;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <div style="font-weight:700;color:#7c3aed;font-size:0.95rem;">🌉 Add BOQ Item — ${struct.name}</div>
+            <button onclick="document.getElementById('structBOQItemModal').remove()" style="background:none;border:none;font-size:1.1rem;cursor:pointer;">✕</button>
+        </div>
+        <div style="display:grid;gap:10px;">
+            <div style="display:grid;grid-template-columns:100px 1fr;gap:8px;">
+                <div><label style="font-size:0.73rem;font-weight:600;color:var(--navy);display:block;margin-bottom:3px;">Item No</label>
+                <input id="sbItemNo" type="text" placeholder="e.g. 01" style="width:100%;padding:6px 8px;border:1px solid var(--border-medium);border-radius:4px;font-size:0.82rem;box-sizing:border-box;"></div>
+                <div><label style="font-size:0.73rem;font-weight:600;color:var(--navy);display:block;margin-bottom:3px;">Description</label>
+                <input id="sbDesc" type="text" placeholder="e.g. RCC Foundation 1:1.5:3" style="width:100%;padding:6px 8px;border:1px solid var(--border-medium);border-radius:4px;font-size:0.82rem;box-sizing:border-box;"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+                <div><label style="font-size:0.73rem;font-weight:600;color:var(--navy);display:block;margin-bottom:3px;">Unit</label>
+                <select id="sbUnit" style="width:100%;padding:6px 8px;border:1px solid var(--border-medium);border-radius:4px;font-size:0.82rem;box-sizing:border-box;">
+                    <option>Cum</option><option>Sqm</option><option>MT</option><option>Nos</option><option>RMT</option><option>Kg</option><option>LS</option>
+                </select></div>
+                <div><label style="font-size:0.73rem;font-weight:600;color:var(--navy);display:block;margin-bottom:3px;">Quantity</label>
+                <input id="sbQty" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid var(--border-medium);border-radius:4px;font-size:0.82rem;box-sizing:border-box;"></div>
+                <div><label style="font-size:0.73rem;font-weight:600;color:var(--navy);display:block;margin-bottom:3px;">Rate (₹)</label>
+                <input id="sbRate" type="number" placeholder="0" style="width:100%;padding:6px 8px;border:1px solid var(--border-medium);border-radius:4px;font-size:0.82rem;box-sizing:border-box;"></div>
+            </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
+            <button onclick="document.getElementById('structBOQItemModal').remove()" style="padding:7px 14px;border:1px solid var(--border-medium);background:#fff;border-radius:4px;cursor:pointer;font-size:0.82rem;">Cancel</button>
+            <button onclick="structBOQSaveItem(${structIdx})" style="padding:7px 16px;background:#7c3aed;color:#fff;border:none;border-radius:4px;font-weight:700;cursor:pointer;font-size:0.82rem;">Add Item</button>
+        </div>
+    </div>`;
+    document.body.appendChild(modal);
+}
+
+function structBOQSaveItem(structIdx) {
+    const itemNo = document.getElementById('sbItemNo').value.trim();
+    const desc   = document.getElementById('sbDesc').value.trim();
+    const unit   = document.getElementById('sbUnit').value;
+    const qty    = parseFloat(document.getElementById('sbQty').value)||0;
+    const rate   = parseFloat(document.getElementById('sbRate').value)||0;
+    if (!desc) { showToast('Please enter description','error'); return; }
+    const struct = KALYANTRA.data.structures[structIdx];
+    if (!KALYANTRA.data.boq) KALYANTRA.data.boq = {sections:[],structureBOQ:[],generationConfig:{sequence:[],productivityRates:{},confirmed:false}};
+    if (!KALYANTRA.data.boq.structureBOQ) KALYANTRA.data.boq.structureBOQ = [];
+    let sbEntry = KALYANTRA.data.boq.structureBOQ.find(sb => sb.structureId == struct.id);
+    if (!sbEntry) { sbEntry = {structureId:struct.id,structureName:struct.name,chainage:struct.chainage,items:[]}; KALYANTRA.data.boq.structureBOQ.push(sbEntry); }
+    sbEntry.items.push({itemNo,description:desc,unit,qty,rate});
+    KALYANTRA.save();
+    document.getElementById('structBOQItemModal').remove();
+    renderStructureBOQInline(structIdx);
+    showToast('✅ BOQ item added to '+struct.name,'success');
+}
+
+function structBOQDeleteItem(structIdx, ii) {
+    const struct = KALYANTRA.data.structures[structIdx];
+    const sbEntry = (KALYANTRA.data.boq?.structureBOQ||[]).find(sb=>sb.structureId==struct.id);
+    if (sbEntry) { sbEntry.items.splice(ii,1); KALYANTRA.save(); renderStructureBOQInline(structIdx); }
+}
+
+// ── AUTO-INIT ON TCS TAB OPEN ────────────────────────────────────────────
+const _tcsOrigSwitch = typeof sidebarSwitchTab === 'function' ? sidebarSwitchTab : null;
+if (_tcsOrigSwitch) {
+    sidebarSwitchTab = function(index, clickedItem) {
+        _tcsOrigSwitch(index, clickedItem);
+        if (index === 1) {
+            setTimeout(() => { populateTCSClassification(); renderBOQSections(); }, 120);
         }
+    };
+}
+// Also initialize on page load if TCS tab visible
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        populateTCSClassification();
+        // Inject BOQ panels into Structures tab rows on first load
+        document.querySelectorAll('#structuresTable tr[id]').forEach((row, idx) => {
+            injectStructureBOQPanel(idx);
+        });
+    }, 600);
+});
 
-        // Patch renderBOQSections to also update structures list
-        const _origRenderBOQ = typeof renderBOQSections === 'function' ? renderBOQSections : null;
-        function renderBOQSectionsAndStructures() {
-            if (typeof renderBOQSections === 'function') renderBOQSections();
-            renderStructuresBOQList();
-        }
+function injectStructureBOQPanel(idx) {
+    const panelId = 'structBOQPanel_'+idx;
+    if (document.getElementById(panelId)) return;
+    const div = document.createElement('div');
+    div.id = panelId;
+    // Will be rendered when structure is selected
+}
 
-        // Override boqDeleteSection to use tcs edit
-        const _origBoqDelete = typeof boqDeleteSection === 'function' ? boqDeleteSection : null;
-
-        // Auto-populate master TCS form when TCS tab is opened
-        const _origSidebarSwitch = sidebarSwitchTab;
-        sidebarSwitchTab = function(index, clickedItem) {
-            _origSidebarSwitch(index, clickedItem);
-            if (index === 1) {
-                setTimeout(() => {
-                    populateMasterTCSForm();
-                    renderBOQSections();
-                    renderStructuresBOQList();
-                }, 100);
-            }
-        };
-
-    </script>
+</script>
 </body>
 </html>
