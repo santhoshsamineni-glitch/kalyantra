@@ -1,6 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- SUPABASE CLIENT -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPA_URL = 'https://upuwkzykkcclpzkytvdh.supabase.co';
+        const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwdXdrenlra2NjbHB6a3l0dmRoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwNTA2ODIsImV4cCI6MjA4NzYyNjY4Mn0.8UE9QFgn3zgqQ1EvhFLqwS-eomXSD6GTYykUh2ZvN8Q';
+        const supa     = supabase.createClient(SUPA_URL, SUPA_KEY);
+        const KALYANTRA_PROJECT_ID = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
+
+        async function supabaseSave(data) {
+            try {
+                const p = data.project || {};
+                const t = data.tcs    || {};
+                const cal = data.calendar || {};
+                const res = data.resources || {};
+                const pid = KALYANTRA_PROJECT_ID;
+
+                await supa.from('projects').upsert({
+                    id: pid, name: p.name||'New Project', budget: p.budget||0,
+                    start_date: p.startDate||null, end_date: p.endDate||null,
+                    location: p.location||'', start_chainage: p.startChainage||0,
+                    end_chainage: p.endChainage||5000, version:'6.6'
+                }, {onConflict:'id'});
+
+                const existingTCS = await supa.from('tcs').select('id').eq('project_id',pid).maybeSingle();
+                const tcsData = { project_id:pid, carriage_width:t.carriageWidth||7.0, shoulder_width:t.shoulderWidth||1.5, layers:t.layers||{} };
+                if (existingTCS.data) await supa.from('tcs').update(tcsData).eq('project_id',pid);
+                else await supa.from('tcs').insert(tcsData);
+
+                if (data.structures) {
+                    await supa.from('structures').delete().eq('project_id',pid);
+                    if (data.structures.length>0) {
+                        await supa.from('structures').insert(data.structures.map((s,i)=>({
+                            project_id:pid, name:s.name||'Structure', type:s.type||'box_culvert',
+                            chainage:s.chainage||0, size:s.size||'', concrete_qty:s.concreteQty||0,
+                            excavation_qty:s.excavationQty||0, foundation_qty:s.foundationQty||0, sort_order:i+1
+                        })));
+                    }
+                }
+
+                if (data.hindrances) {
+                    await supa.from('hindrances').delete().eq('project_id',pid);
+                    if (data.hindrances.length>0) {
+                        await supa.from('hindrances').insert(data.hindrances.map((h,i)=>({
+                            project_id:pid, name:h.name||'Hindrance', type:h.type||'land',
+                            category:h.category||h.type||'land', chainage_start:h.chainageStart||0,
+                            chainage_end:h.chainageEnd||0, status:h.status||'Pending',
+                            impact:h.impact||'', resolution_days:h.resolutionDays||0, sort_order:i+1
+                        })));
+                    }
+                }
+
+                const existingCal = await supa.from('calendar').select('id').eq('project_id',pid).maybeSingle();
+                const calData = { project_id:pid, working_days:cal.workingDays||[1,2,3,4,5,6],
+                    hours_per_day:cal.hoursPerDay||8, monsoon_start:cal.monsoonStart||null,
+                    monsoon_end:cal.monsoonEnd||null, holidays:cal.holidays||[] };
+                if (existingCal.data) await supa.from('calendar').update(calData).eq('project_id',pid);
+                else await supa.from('calendar').insert(calData);
+
+                const existingRes = await supa.from('resources').select('id').eq('project_id',pid).maybeSingle();
+                const resData = { project_id:pid, equipment:res.equipment||[], manpower:res.manpower||[], materials:res.materials||[] };
+                if (existingRes.data) await supa.from('resources').update(resData).eq('project_id',pid);
+                else await supa.from('resources').insert(resData);
+
+                if (data.milestones!==undefined) {
+                    await supa.from('milestones').delete().eq('project_id',pid);
+                    if (data.milestones.length>0) {
+                        await supa.from('milestones').insert(data.milestones.map((m,i)=>({
+                            project_id:pid, description:m.description||'', target_date:m.targetDate||null,
+                            completion:m.completion||0, sort_order:i+1
+                        })));
+                    }
+                }
+
+                try { localStorage.setItem('kalyantra_v65_data', JSON.stringify(Object.assign({},data,{_version:'6.6'}))); } catch(e) {}
+                console.log('✅ Saved to Supabase');
+                updateConnectionBadge(true);
+                return true;
+            } catch(err) {
+                console.error('❌ Supabase save failed:', err);
+                try { localStorage.setItem('kalyantra_v65_data', JSON.stringify(Object.assign({},data,{_version:'6.6'}))); } catch(e) {}
+                updateConnectionBadge(false);
+                return false;
+            }
+        }
+
+        async function supabaseLoad() {
+            try {
+                const pid = KALYANTRA_PROJECT_ID;
+                const [projRes,tcsRes,structRes,hindRes,calRes,resRes,milRes,apRes] = await Promise.all([
+                    supa.from('projects').select('*').eq('id',pid).maybeSingle(),
+                    supa.from('tcs').select('*').eq('project_id',pid).maybeSingle(),
+                    supa.from('structures').select('*').eq('project_id',pid).order('sort_order'),
+                    supa.from('hindrances').select('*').eq('project_id',pid).order('sort_order'),
+                    supa.from('calendar').select('*').eq('project_id',pid).maybeSingle(),
+                    supa.from('resources').select('*').eq('project_id',pid).maybeSingle(),
+                    supa.from('milestones').select('*').eq('project_id',pid).order('sort_order'),
+                    supa.from('activity_progress').select('*').eq('project_id',pid)
+                ]);
+
+                const result = {};
+                if (projRes.data) {
+                    const p = projRes.data;
+                    result.project = { name:p.name, budget:parseFloat(p.budget)||0,
+                        startDate:p.start_date, endDate:p.end_date, location:p.location,
+                        startChainage:p.start_chainage, endChainage:p.end_chainage,
+                        industryType:p.industry_type||'Road Construction', projectMode:p.project_mode||'EPC' };
+                }
+                if (tcsRes.data) {
+                    const t = tcsRes.data;
+                    result.tcs = { carriageWidth:parseFloat(t.carriage_width)||7.0,
+                        shoulderWidth:parseFloat(t.shoulder_width)||1.5, layers:t.layers||{} };
+                }
+                if (structRes.data) {
+                    result.structures = structRes.data.map(s=>({
+                        id:s.sort_order, name:s.name, type:s.type, chainage:s.chainage,
+                        size:s.size, concreteQty:parseFloat(s.concrete_qty)||0,
+                        excavationQty:parseFloat(s.excavation_qty)||0, foundationQty:parseFloat(s.foundation_qty)||0
+                    }));
+                }
+                if (hindRes.data) {
+                    result.hindrances = hindRes.data.map(h=>({
+                        id:h.sort_order, name:h.name, type:h.type, category:h.category,
+                        chainageStart:h.chainage_start, chainageEnd:h.chainage_end,
+                        status:h.status, impact:h.impact, resolutionDays:h.resolution_days||0
+                    }));
+                }
+                if (calRes.data) {
+                    const cal = calRes.data;
+                    result.calendar = { workingDays:cal.working_days||[1,2,3,4,5,6],
+                        hoursPerDay:cal.hours_per_day||8, monsoonStart:cal.monsoon_start,
+                        monsoonEnd:cal.monsoon_end, holidays:cal.holidays||[] };
+                }
+                if (resRes.data) {
+                    result.resources = { equipment:resRes.data.equipment||[],
+                        manpower:resRes.data.manpower||[], materials:resRes.data.materials||[] };
+                }
+                if (milRes.data) {
+                    result.milestones = milRes.data.map(m=>({
+                        description:m.description, targetDate:m.target_date, completion:m.completion||0
+                    }));
+                }
+                result.activityProgress = {};
+                if (apRes.data) apRes.data.forEach(row=>{ result.activityProgress[row.progress_key]=row.actual_pct; });
+
+                updateConnectionBadge(true);
+                console.log('✅ Loaded from Supabase');
+                return result;
+            } catch(err) {
+                console.error('❌ Supabase load failed:', err);
+                updateConnectionBadge(false);
+                return null;
+            }
+        }
+
+        async function supabaseSaveProgress(progressKey, pct) {
+            try {
+                await supa.from('activity_progress').upsert({
+                    project_id:KALYANTRA_PROJECT_ID, progress_key:progressKey, actual_pct:pct
+                }, {onConflict:'project_id,progress_key'});
+            } catch(err) { console.warn('Progress save failed:', err); }
+        }
+
+        function updateConnectionBadge(connected) {
+            const dot   = document.getElementById('supaStatusDot');
+            const label = document.getElementById('supaStatusLabel');
+            if (!dot || !label) return;
+            if (connected) {
+                dot.style.background   = '#16a34a';
+                dot.style.boxShadow    = '0 0 6px #16a34a';
+                label.textContent      = '🟢 DB Connected';
+                label.style.color      = '#15803d';
+            } else {
+                dot.style.background   = '#dc2626';
+                dot.style.boxShadow    = '0 0 6px #dc2626';
+                label.textContent      = '🔴 Offline Mode';
+                label.style.color      = '#dc2626';
+            }
+        }
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KALYANTRA V6.6 - All Audit Fixes Applied | Road Construction PM</title>
@@ -1311,6 +1491,15 @@
                     <span id="headerTabLabel" style="color:var(--accent-gold);font-weight:600;">📋 Project Basics</span>
                     <span style="opacity:0.5;">|</span>
                     <span>NH-65 Widening Project</span>
+                </div>
+                <!-- DB CONNECTION BADGE -->
+                <div style="display:flex;align-items:center;gap:6px;margin-left:20px;
+                    background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+                    border-radius:20px;padding:4px 12px;cursor:default;">
+                    <span id="supaStatusDot" style="width:8px;height:8px;border-radius:50%;
+                        background:#f59e0b;display:inline-block;transition:all 0.4s;"></span>
+                    <span id="supaStatusLabel" style="font-size:0.7rem;font-weight:700;
+                        color:rgba(255,255,255,0.85);letter-spacing:0.03em;">⏳ Connecting...</span>
                 </div>
             </div>
 
@@ -5500,7 +5689,8 @@
             const progressKey = wbsId + '.' + actId;
             if (!KALYANTRA.data.activityProgress) KALYANTRA.data.activityProgress = {};
             KALYANTRA.data.activityProgress[progressKey] = pctNum;
-            KALYANTRA.save(); // FIX: persist immediately on slider move
+            supabaseSaveProgress(progressKey, pctNum);
+            try { const _sd=Object.assign({},KALYANTRA.data,{_version:'6.6'}); localStorage.setItem('kalyantra_v65_data',JSON.stringify(_sd)); } catch(e) {}
             // Find activity in computed and update actualPct
             const act = KALYANTRA.computed.activities.find(a => a.wbs === wbsId && String(a.id) === String(actId));
             if (act) {
@@ -7727,32 +7917,38 @@
         // SPRINT 4 S4-02: KALYANTRA.save() / KALYANTRA.load() — localStorage
         // ================================================================
         KALYANTRA.save = function() {
-            try {
-                const _sd = Object.assign({}, this.data, {_version:'6.6'});
-                localStorage.setItem('kalyantra_v65_data', JSON.stringify(_sd)); // FIX-LA10
-            } catch(e) { console.warn('Save failed:', e); }
+            supabaseSave(this.data).catch(e => console.warn('Save error:', e));
         };
 
-        KALYANTRA.load = function() {
-            try {
-                const saved = localStorage.getItem('kalyantra_v65_data');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    // FIX-LA10b: discard saves from old schema versions
-                    if (parsed._version && parsed._version < '6.5') {
-                        console.warn('Old save discarded, version:', parsed._version);
-                        localStorage.removeItem('kalyantra_v65_data');
-                        return false;
+        KALYANTRA.load = function() { return false; };
+
+        KALYANTRA.loadFromSupabase = async function() {
+            const data = await supabaseLoad();
+            if (data) {
+                ['project','tcs','structures','hindrances','calendar',
+                 'resources','milestones','activityProgress'].forEach(key => {
+                    if (data[key] !== undefined) this.data[key] = data[key];
+                });
+                this.refresh();
+                if (typeof renderHolidayTable        === 'function') renderHolidayTable();
+                if (typeof renderWorkingDaysSelector  === 'function') renderWorkingDaysSelector();
+                if (typeof renderMilestoneTracker     === 'function') renderMilestoneTracker();
+                return true;
+            } else {
+                try {
+                    const saved = localStorage.getItem('kalyantra_v65_data');
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        ['project','tcs','structures','hindrances','calendar',
+                         'resources','milestones','activityProgress'].forEach(key => {
+                            if (parsed[key] !== undefined) this.data[key] = parsed[key];
+                        });
+                        this.refresh();
+                        showToast('⚠️ Offline mode — using local storage', 'info');
                     }
-                    // Deep merge — preserve structure
-                    ['project','tcs','structures','hindrances','calendar','resources','milestones','activityProgress'].forEach(key => {
-                        if (parsed[key] !== undefined) this.data[key] = parsed[key];
-                    });
-                    console.log('💾 KALYANTRA data restored from localStorage');
-                    return true;
-                }
-            } catch(e) { console.warn('Load failed:', e); }
-            return false;
+                } catch(e) {}
+                return false;
+            }
         };
 
         KALYANTRA.clearSaved = function() {
@@ -8055,15 +8251,16 @@
         }
         
         // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             KALYANTRA.init();
             initSidebar();
-            // Trigger initial renders after data is ready
+            await KALYANTRA.loadFromSupabase();
             setTimeout(() => {
                 KALYANTRA.render.wbsTable();
                 KALYANTRA.render.dashboard();
                 updateWBSStatBar();
-            }, 300);
+                if (typeof renderWorkingDaysSelector==='function') renderWorkingDaysSelector();
+            }, 200);
         });
         
         console.log('✅ KALYANTRA V6.5 — 27 audit fixes applied (12 Logic + 15 UI/UX)');
